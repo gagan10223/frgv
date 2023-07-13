@@ -196,3 +196,4 @@ void searchForProduct(const inventory& Products)
         cout << "Product not found in the inventory." << endl;
     }
 }
+//check
