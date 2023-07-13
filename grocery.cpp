@@ -73,18 +73,39 @@ void addProductToInventory(inventory& Products)
     cout << "8. Canned Foods" << endl;
     cout << "9. Snacks" << endl;
     cout << "10. Beverages" << endl;
+    cout << "11. citrusfruit" << endl;
+    cout << "12. orange" << endl;
+
+    
 
     int category;
     cout << "Enter the product category (1-10): ";
     cin >> category;
+    cin.ignore();
+    string citrus_type;
+    string orange_type;
+    if(category == 11 || category == 12)
+    {
+        if (category == 11)
+        {
+            cout << "Enter the citrustype of the fruit: ";
+            getline(cin, citrus_type);
+        }
+        else
+        {
+            cout << "Enter the citrus type of the fruit: ";
+            getline(cin, citrus_type);
+            cout << "Enter the orange type of the citrusfruit: ";
+            getline(cin, orange_type);
+        }
+    }
 
-    cin.ignore(); // Ignore the newline character after reading the category
 
     string name;
     double price;
     int quantity;
 
-    cout << "Enter the name of the product: ";
+    cout << "Enter the name of the product: " << endl;
     getline(cin, name);
 
     cout << "Enter the quantity of the product: ";
@@ -158,6 +179,19 @@ void addProductToInventory(inventory& Products)
         getline(cin, typeOrOrigin);
         Products.add_inventory(new beverages(name, price, quantity, typeOrOrigin));
         break;
+    case 11:
+        cout << "Enter the origin/type of fruit: ";
+        cin.ignore();
+        getline(cin, typeOrOrigin);
+        Products.add_inventory(new citrusfruit(name,price,quantity,typeOrOrigin,citrus_type));
+        break;
+    case 12:
+        cout << "Enter the origin/type of fruit: ";
+        cin.ignore();
+        getline(cin, typeOrOrigin);
+        Products.add_inventory(new orange(name,price,quantity,typeOrOrigin,citrus_type,orange_type));
+        break;
+        
     default:
         cout << "\nInvalid category choice." << endl;
         break;

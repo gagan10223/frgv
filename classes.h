@@ -1,198 +1,315 @@
+#pragma once
+
 #include <iostream>
-#include <string>
 #include <vector>
-#include "classes.h"
+#include <string>
 
 using namespace std;
 
-void displayMenu();
-void addProductToInventory(inventory& Products);
-void updateProductQuantity(inventory& Products);
-void searchForProduct(const inventory& Products);
-
-int main()
+class product
 {
-    inventory Products;
-
-    int choice;
-    do
-    {
-        displayMenu();
-        cin >> choice;
-
-        switch (choice)
-        {
-        case 1:
-            addProductToInventory(Products);
-            break;
-        case 2:
-            Products.display_info();
-            break;
-        case 3:
-            updateProductQuantity(Products);
-            break;
-        case 4:
-            searchForProduct(Products);
-            break;
-        case 0:
-            cout << "\n>>> Exiting the program...\n\n";
-            break;
-        default:
-            cout << "\n!!! Invalid choice. Please try again.\n\n";
-            break;
-        }
-
-    } while (choice != 0);
-
-    return 0;
-}
-
-void displayMenu()
-{
-    cout << "\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n";
-    cout << "\n\tGrocery Store Inventory Management System\n\n";
-    cout << "1. Add a Product\n";
-    cout << "2. Display Products in Inventory\n";
-    cout << "3. Update Quantity of a Product\n";
-    cout << "4. Search for a Product\n";
-    cout << "0. Exit\n";
-    cout << "\n>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>\n";
-    cout << "Enter your choice: ";
-}
-
-void addProductToInventory(inventory& Products)
-{
-    cout << "\nProduct Category" << endl;
-    cout << "1. Fruit" << endl;
-    cout << "2. Vegetable" << endl;
-    cout << "3. Dairy" << endl;
-    cout << "4. Meats" << endl;
-    cout << "5. Seafood" << endl;
-    cout << "6. Bakery" << endl;
-    cout << "7. Frozen Foods" << endl;
-    cout << "8. Canned Foods" << endl;
-    cout << "9. Snacks" << endl;
-    cout << "10. Beverages" << endl;
-
-    int category;
-    cout << "Enter the product category (1-10): ";
-    cin >> category;
-
-    cin.ignore(); // Ignore the newline character after reading the category
-
+protected:
     string name;
     double price;
     int quantity;
 
-    cout << "Enter the name of the product: ";
-    getline(cin, name);
-
-    cout << "Enter the quantity of the product: ";
-    cin >> quantity;
-
-    cout << "Enter the price of the product: ";
-    cin >> price;
-
-    string typeOrOrigin;
-
-    // Create a product based on the selected category and add it to the inventory
-    switch (category)
+public:
+    product(const string& a1, double a2, int a3 = 0)
+        : name(a1), price(a2), quantity(a3)
     {
-    case 1:
-        cout << "Enter the origin of the fruit: ";
-        cin.ignore();
-        getline(cin, typeOrOrigin);
-        Products.add_inventory(new fruit(name, price, quantity, typeOrOrigin));
-        break;
-    case 2:
-        cout << "Enter the type of the vegetable: ";
-        cin.ignore();
-        getline(cin, typeOrOrigin);
-        Products.add_inventory(new vegetable(name, price, quantity, typeOrOrigin));
-        break;
-    case 3:
-        cout << "Enter the origin of the dairy product: ";
-        cin.ignore();
-        getline(cin, typeOrOrigin);
-        Products.add_inventory(new dairy(name, price, quantity, typeOrOrigin));
-        break;
-    case 4:
-        cout << "Enter the type of meat: ";
-        cin.ignore();
-        getline(cin, typeOrOrigin);
-        Products.add_inventory(new meats(name, price, quantity, typeOrOrigin));
-        break;
-    case 5:
-        cout << "Enter the type of seafood: ";
-        cin.ignore();
-        getline(cin, typeOrOrigin);
-        Products.add_inventory(new seafood(name, price, quantity, typeOrOrigin));
-        break;
-    case 6:
-        cout << "Enter the type of bakery item: ";
-        cin.ignore();
-        getline(cin, typeOrOrigin);
-        Products.add_inventory(new bakery(name, price, quantity, typeOrOrigin));
-        break;
-    case 7:
-        cout << "Enter the type of frozen food: ";
-        cin.ignore();
-        getline(cin, typeOrOrigin);
-        Products.add_inventory(new frozenFoods(name, price, quantity, typeOrOrigin));
-        break;
-    case 8:
-        cout << "Enter the type of canned food: ";
-        cin.ignore();
-        getline(cin, typeOrOrigin);
-        Products.add_inventory(new cannedFoods(name, price, quantity, typeOrOrigin));
-        break;
-    case 9:
-        cout << "Enter the type of snack: ";
-        cin.ignore();
-        getline(cin, typeOrOrigin);
-        Products.add_inventory(new snacks(name, price, quantity, typeOrOrigin));
-        break;
-    case 10:
-        cout << "Enter the type of beverage: ";
-        cin.ignore();
-        getline(cin, typeOrOrigin);
-        Products.add_inventory(new beverages(name, price, quantity, typeOrOrigin));
-        break;
-    default:
-        cout << "\nInvalid category choice." << endl;
-        break;
     }
-}
 
-void updateProductQuantity(inventory& Products)
-{
-    cout << "\nEnter the name of the product to update quantity: ";
-    cin.ignore();
-    string productName;
-    getline(cin, productName);
+    void set_name(const string& a1) { name = a1; }
+    void set_price(double a2) { price = a2; }
+    void set_quantity(int a3) { quantity = a3; }
 
-    cout << "Enter the new quantity: ";
-    int newQuantity;
-    cin >> newQuantity;
+    string get_name() const { return name; }
+    double get_price() const { return price; }
+    int get_quantity() const { return quantity; }
 
-    Products.update_quantity(productName, newQuantity);
-}
+    virtual double calculate_price(int quantity) { return price * quantity; }
 
-void searchForProduct(const inventory& Products)
-{
-    cout << "\nEnter the name of the product to search: ";
-    cin.ignore();
-    string productName;
-    getline(cin, productName);
-
-    const product* foundProduct = Products.search_product(productName);
-    if (foundProduct != nullptr)
+    virtual void display() const
     {
-        cout << "\nProduct found in the inventory: " << endl;
-        foundProduct->display();
+        cout << "Product Name: " << name << endl;
+        cout << "Product Price: $" << price << endl;
+        cout << "Product Quantity: " << quantity << endl;
     }
-    else
+};
+
+class dairy : public product
+{
+protected:
+    string origin;
+
+public:
+    dairy(const string& a1, double a2, int a3, const string& a4)
+        : product(a1, a2, a3), origin(a4)
     {
+    }
+
+
+    virtual void display() const override
+    {
+        product::display();
+        cout << "Origin: " << origin << endl;
+    }
+};
+
+class fruit : public product
+{
+protected:
+    string origin;
+
+public:
+    fruit(const string& a1, double a2, int a3, const string& a4)
+        : product(a1, a2, a3), origin(a4)
+    {
+    }
+
+    virtual void display() const override
+    {
+        product::display();
+        cout << "Origin: " << origin << endl;
+    }
+};
+class citrusfruit: public fruit{
+    protected:
+    string citrustype;
+
+    public:
+    citrusfruit(const string& a1, double a2, int a3, const string& a4, const string& a5)
+    :     fruit(a1,a2,a3,a4), citrustype(a5){}
+    
+    virtual void display() const override
+    {
+        fruit::display();
+        cout << "type: " << citrustype << endl;
+    }
+};
+
+class orange: public citrusfruit{
+    protected:
+    string orangetype;
+
+    public:
+    orange(const string& a1, double a2, int a3, const string& a4, const string& a5,const string& a6)
+    : citrusfruit(a1,a2,a3,a4,a5), orangetype(a6){}
+
+    virtual void display() const override
+    {
+        citrusfruit::display();
+        cout << "type_of: " << orangetype << endl;
+    }
+
+};
+
+class vegetable : public product
+{
+protected:
+    string type;
+
+public:
+    vegetable(const string& a1, double a2, int a3, const string& a4)
+        : product(a1, a2, a3), type(a4)
+    {
+    }
+
+    virtual void display() const override
+    {
+        product::display();
+        cout << "Type: " << type << endl;
+    }
+};
+
+class meats : public product
+{
+protected:
+    string type;
+
+public:
+    meats(const string& a1, double a2, int a3, const string& a4)
+        : product(a1, a2, a3), type(a4)
+    {
+    }
+
+    virtual void display() const override
+    {
+        product::display();
+        cout << "Type: " << type << endl;
+    }
+};
+
+class seafood : public product
+{
+protected:
+    string type;
+
+public:
+    seafood(const string& a1, double a2, int a3, const string& a4)
+        : product(a1, a2, a3), type(a4)
+    {
+    }
+
+    virtual void display() const override
+    {
+        product::display();
+        cout << "Type: " << type << endl;
+    }
+};
+
+class bakery : public product
+{
+protected:
+    string type;
+
+public:
+    bakery(const string& a1, double a2, int a3, const string& a4)
+        : product(a1, a2, a3), type(a4)
+    {
+    }
+
+    virtual void display() const override
+    {
+        product::display();
+        cout << "Type: " << type << endl;
+    }
+};
+
+class frozenFoods : public product
+{
+protected:
+    string type;
+
+public:
+    frozenFoods(const string& a1, double a2, int a3, const string& a4)
+        : product(a1, a2, a3), type(a4)
+    {
+    }
+
+    virtual void display() const override
+    {
+        product::display();
+        cout << "Type: " << type << endl;
+    }
+};
+
+class cannedFoods : public product
+{
+protected:
+    string type;
+
+public:
+    cannedFoods(const string& a1, double a2, int a3, const string& a4)
+        : product(a1, a2, a3), type(a4)
+    {
+    }
+
+    virtual void display() const override
+    {
+        product::display();
+        cout << "Type: " << type << endl;
+    }
+};
+
+class snacks : public product
+{
+protected:
+    string type;
+
+public:
+    snacks(const string& a1, double a2, int a3, const string& a4)
+        : product(a1, a2, a3), type(a4)
+    {
+    }
+
+    virtual void display() const override
+    {
+        product::display();
+        cout << "Type: " << type << endl;
+    }
+};
+
+class beverages : public product
+{
+protected:
+    string type;
+
+public:
+    beverages(const string& a1, double a2, int a3, const string& a4)
+        : product(a1, a2, a3), type(a4)
+    {
+    }
+
+    virtual void display() const override
+    {
+        product::display();
+        cout << "Type: " << type << endl;
+    }
+};
+
+class inventory
+{
+private:
+    vector<product*> products;
+
+public:
+    ~inventory()
+    {
+        // Free the memory allocated to product objects
+        for (product* p : products)
+        {
+            delete p;
+        }
+    }
+
+    void add_inventory(product* item)
+    {
+        products.push_back(item);
+    }
+
+    void update_quantity(const string& productName, int newQuantity)
+    {
+        for (product* p : products)
+        {
+            if (p->get_name() == productName)
+            {
+                p->set_quantity(newQuantity);
+                cout << "Quantity updated successfully." << endl;
+                return;
+            }
+        }
+
         cout << "Product not found in the inventory." << endl;
     }
-}
+
+    const product* search_product(const string& productName) const
+    {
+        for (const product* p : products)
+        {
+            if (p->get_name() == productName)
+            {
+                return p;
+            }
+        }
+
+        return nullptr;
+    }
+
+    void display_info() const
+    {
+        if (products.empty())
+        {
+            cout << "Inventory is empty." << endl;
+        }
+        else
+        {
+            cout << "\nProducts in Inventory:" << endl;
+            for (const product* p : products)
+            {
+                p->display();
+                cout << "------------------------" << endl;
+            }
+        }
+    }
+};
