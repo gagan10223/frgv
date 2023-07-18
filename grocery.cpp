@@ -180,13 +180,13 @@ void addProductToInventory(inventory& Products)
         Products.add_inventory(new beverages(name, price, quantity, typeOrOrigin));
         break;
     case 11:
-        cout << "Enter the origin/type of fruit: ";
+        cout << "Enter the origin of fruit: ";
         cin.ignore();
         getline(cin, typeOrOrigin);
         Products.add_inventory(new citrusfruit(name,price,quantity,typeOrOrigin,citrus_type));
         break;
     case 12:
-        cout << "Enter the origin/type of fruit: ";
+        cout << "Enter the origin of fruit: ";
         cin.ignore();
         getline(cin, typeOrOrigin);
         Products.add_inventory(new orange(name,price,quantity,typeOrOrigin,citrus_type,orange_type));
