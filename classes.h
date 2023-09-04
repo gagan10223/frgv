@@ -3,6 +3,8 @@
 #include <iostream>
 #include <vector>
 #include <string>
+#include <algorithm>
+#include <cctype>
 
 using namespace std;
 
@@ -37,25 +39,6 @@ public:
     }
 };
 
-class dairy : public product
-{
-protected:
-    string origin;
-
-public:
-    dairy(const string& a1, double a2, int a3, const string& a4)
-        : product(a1, a2, a3), origin(a4)
-    {
-    }
-
-
-    virtual void display() const override
-    {
-        product::display();
-        cout << "Origin: " << origin << endl;
-    }
-};
-
 class fruit : public product
 {
 protected:
@@ -73,36 +56,52 @@ public:
         cout << "Origin: " << origin << endl;
     }
 };
-class citrusfruit: public fruit{
-    protected:
-    string citrustype;
 
-    public:
-    citrusfruit(const string& a1, double a2, int a3, const string& a4, const string& a5)
-    :     fruit(a1,a2,a3,a4), citrustype(a5){}
-    
-    virtual void display() const override
+class Mangoes : public product {
+protected:
+    string variety;
+public:
+    Mangoes(const string& a1, double a2, int a3, const string& a4)
+        : product(a1, a2, a3), variety(a4)
     {
-        fruit::display();
-        cout << "type: " << citrustype << endl;
+    }
+
+    virtual void display() const override {
+        product::display();
+        cout << "Mango Variety: " << variety << endl;
     }
 };
 
-class orange: public citrusfruit{
-    protected:
-    string orangetype;
-
-    public:
-    orange(const string& a1, double a2, int a3, const string& a4, const string& a5,const string& a6)
-    : citrusfruit(a1,a2,a3,a4,a5), orangetype(a6){}
-
-    virtual void display() const override
+class PakistaniMangoes : public Mangoes {
+protected:
+    string region;
+public:
+    PakistaniMangoes(const string& a1, double a2, int a3, const string& a4, const string& a5)
+        : Mangoes(a1, a2, a3, a4), region(a5)
     {
-        citrusfruit::display();
-        cout << "type_of: " << orangetype << endl;
     }
 
+    virtual void display() const override {
+        Mangoes::display();
+        cout << "Region: " << region << endl;
+    }
 };
+
+class Chaunsa : public PakistaniMangoes {
+protected:
+    string taste;
+public:
+    Chaunsa(const string& a1, double a2, int a3, const string& a4, const string& a5, const string& a6)
+        : PakistaniMangoes(a1, a2, a3, a4, a5), taste(a6)
+    {
+    }
+
+    virtual void display() const override {
+        PakistaniMangoes::display();
+        cout << "Taste: " << taste << endl;
+    }
+};
+
 
 class vegetable : public product
 {
@@ -119,6 +118,24 @@ public:
     {
         product::display();
         cout << "Type: " << type << endl;
+    }
+};
+
+class dairy : public product
+{
+protected:
+    string origin;
+
+public:
+    dairy(const string& a1, double a2, int a3, const string& a4)
+        : product(a1, a2, a3), origin(a4)
+    {
+    }
+
+    virtual void display() const override
+    {
+        product::display();
+        cout << "Type: " << origin << endl;
     }
 };
 
@@ -158,13 +175,13 @@ public:
     }
 };
 
-class bakery : public product
+class bakedGood : public product
 {
 protected:
     string type;
 
 public:
-    bakery(const string& a1, double a2, int a3, const string& a4)
+    bakedGood(const string& a1, double a2, int a3, const string& a4)
         : product(a1, a2, a3), type(a4)
     {
     }
@@ -248,6 +265,26 @@ public:
     }
 };
 
+// custom exception for negative price input
+class NegativePriceException : public exception
+{
+public:
+    virtual const char* what() const throw()
+    {
+        return "Invalid price. Price cannot be negative.";
+    }
+};
+
+// custom exception for negative quantity input
+class NegativeQuantityException : public exception
+{
+public:
+    virtual const char* what() const throw()
+    {
+        return "Invalid quantity. Quantity cannot be negative.";
+    }
+};
+
 class inventory
 {
 private:
@@ -256,7 +293,6 @@ private:
 public:
     ~inventory()
     {
-        // Free the memory allocated to product objects
         for (product* p : products)
         {
             delete p;
@@ -270,24 +306,41 @@ public:
 
     void update_quantity(const string& productName, int newQuantity)
     {
+        // validate if the entered quantity is non-negative
+        if (newQuantity < 0) {
+            throw NegativeQuantityException();
+        }
+
+        string lowerProductName = productName;
+        transform(lowerProductName.begin(), lowerProductName.end(), lowerProductName.begin(), ::tolower);
+
         for (product* p : products)
         {
-            if (p->get_name() == productName)
+            string lowerName = p->get_name();
+            transform(lowerName.begin(), lowerName.end(), lowerName.begin(), ::tolower);
+
+            if (lowerName == lowerProductName)
             {
                 p->set_quantity(newQuantity);
-                cout << "Quantity updated successfully." << endl;
+                cout << "\n-= Quantity updated successfully! =-" << endl;
                 return;
             }
         }
 
-        cout << "Product not found in the inventory." << endl;
+        cout << "\n-= Product not found in the inventory. =-" << endl;
     }
 
     const product* search_product(const string& productName) const
     {
+        string lowerProductName = productName;
+        transform(lowerProductName.begin(), lowerProductName.end(), lowerProductName.begin(), ::tolower);
+
         for (const product* p : products)
         {
-            if (p->get_name() == productName)
+            string lowerName = p->get_name();
+            transform(lowerName.begin(), lowerName.end(), lowerName.begin(), ::tolower);
+
+            if (lowerName == lowerProductName)
             {
                 return p;
             }
@@ -296,15 +349,38 @@ public:
         return nullptr;
     }
 
+    void remove_product(const string& productName)
+    {
+        string lowerProductName = productName;
+        transform(lowerProductName.begin(), lowerProductName.end(), lowerProductName.begin(), ::tolower);
+
+        for (auto it = products.begin(); it != products.end(); ++it)
+        {
+            string lowerName = (*it)->get_name();
+            transform(lowerName.begin(), lowerName.end(), lowerName.begin(), ::tolower);
+
+            if (lowerName == lowerProductName)
+            {
+                delete* it;
+                products.erase(it);
+                cout << "\n-= Product removed successfully! =-" << endl;
+                return;
+            }
+        }
+
+        cout << "\n-= Product not found in the inventory. =-" << endl;
+    }
+
     void display_info() const
     {
         if (products.empty())
         {
-            cout << "Inventory is empty." << endl;
+            cout << "\n-= Inventory is empty. =-" << endl;
         }
         else
         {
-            cout << "\nProducts in Inventory:" << endl;
+            cout << "\n-= Products in Inventory =-" << endl;
+            cout << "------------------------" << endl;
             for (const product* p : products)
             {
                 p->display();
@@ -313,3 +389,4 @@ public:
         }
     }
 };
+
